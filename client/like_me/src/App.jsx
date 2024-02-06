@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Form from './components/Form';
 import Post from './components/Post';
-// import { axios } from 'axios';
 
 const urlBaseServer = 'http://localhost:3001';
 
@@ -13,20 +12,32 @@ function App() {
    const [posts, setPosts] = useState([]);
 
    const getPosts = async () => {
-      const { data: posts } = await axios.get(urlBaseServer + '/posts');
-      console.log(posts);
-      setPosts([...posts]);
+      axios
+         .get(`${urlBaseServer}/posts`)
+         .then((response) => {
+            const arreglo = response.data?.posts;
+            if (arreglo) {
+               setPosts([...arreglo]);
+            }
+         })
+         .catch((error) => {
+            console.log(error);
+         });
    };
 
    const agregarPost = async () => {
-      try {
-         const post = { titulo, url: imgSrc, descripcion };
-         console.log(post);
-         await axios.post(urlBaseServer + '/posts', post);
-         getPosts();
-      } catch (error) {
-         console.log('Error en agregarPost: ', error);
+      const post = { titulo, url: imgSrc, descripcion };
+      const respuesta = await axios.post(urlBaseServer + '/posts', post);
+      const claves = respuesta.data;
+      console.log(claves.respuesta);
+      if (claves.respuesta.error) {
+         alert('Todos los campos obligatorios.');
       }
+      getPosts();
+   };
+
+   const modificarPost = async () => {
+      const post = { titulo, imgSrc, descripcion };
    };
 
    // este método se utilizará en el siguiente desafío
@@ -37,6 +48,7 @@ function App() {
 
    // este método se utilizará en el siguiente desafío
    const eliminarPost = async (id) => {
+      console.log(id);
       await axios.delete(urlBaseServer + `/posts/${id}`);
       getPosts();
    };
@@ -58,14 +70,22 @@ function App() {
                />
             </div>
             <div className="col-12 col-sm-8 px-5 row posts align-items-start">
-               {posts.map((post, i) => (
-                  <Post
-                     key={i}
-                     post={post}
-                     like={like}
-                     eliminarPost={eliminarPost}
-                  />
-               ))}
+               {posts.length > 0 ? (
+                  posts.map((post, i) => (
+                     <Post
+                        key={i}
+                        post={post}
+                        like={like}
+                        eliminarPost={eliminarPost}
+                     />
+                  ))
+               ) : (
+                  <div className="card">
+                     <div className="card-body">
+                        <h2>No hay post</h2>
+                     </div>
+                  </div>
+               )}
             </div>
          </div>
       </div>

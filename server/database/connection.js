@@ -1,5 +1,6 @@
 const pk = require('pg');
 require('dotenv').config();
+// import dotenv from 'dotenv/config';
 
 const { Pool } = pk;
 
@@ -21,6 +22,6 @@ const getDatabase = async () => {
    }
 };
 
-getDatabase();
+// getDatabase();
 
-module.exports = pool;
+// module.exports = pool;
