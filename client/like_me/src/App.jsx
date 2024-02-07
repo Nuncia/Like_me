@@ -29,26 +29,21 @@ function App() {
       const post = { titulo, url: imgSrc, descripcion };
       const respuesta = await axios.post(urlBaseServer + '/posts', post);
       const claves = respuesta.data;
-      console.log(claves.respuesta);
+      // console.log(claves.respuesta);
       if (claves.respuesta.error) {
          alert('Todos los campos obligatorios.');
       }
       getPosts();
    };
 
-   const modificarPost = async () => {
-      const post = { titulo, imgSrc, descripcion };
-   };
-
    // este método se utilizará en el siguiente desafío
-   const like = async (id) => {
-      await axios.put(urlBaseServer + `/posts/like/${id}`);
+   const likePostById = async (id) => {
+      const likeUpDate = await axios.put(urlBaseServer + `/posts/likes/${id}`);
       getPosts();
    };
 
    // este método se utilizará en el siguiente desafío
    const eliminarPost = async (id) => {
-      console.log(id);
       await axios.delete(urlBaseServer + `/posts/${id}`);
       getPosts();
    };
@@ -75,8 +70,9 @@ function App() {
                      <Post
                         key={i}
                         post={post}
-                        like={like}
+                        // like={like}
                         eliminarPost={eliminarPost}
+                        likePostById={likePostById}
                      />
                   ))
                ) : (

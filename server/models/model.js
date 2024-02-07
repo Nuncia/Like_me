@@ -1,14 +1,25 @@
-const pool = require('../database/connection.js');
+const { pool, getDatabase } = require('../database/connection');
 
-const obtenerTodosPosts = async () => {
-   try {
-      const consulta = 'SELECT * FROM posts';
-      const pools = await pool.query(consulta);
-      return pools.rows;
-   } catch (err) {
-      console.log('Error al obtener los posts: ', err);
-   }
-};
+// const obtener = async () => {
+//    try {
+//       const consulta = 'select * from posts order by id';
+//       const result = await pool.query(consulta);
+//       return result.rows;
+//    } catch (error) {
+//       console.log('Error en Obtener: ', error);
+//    }
+// };
+// const obtenerTodosPosts = async () => {
+//    try {
+//       const consulta = 'SELECT * FROM posts ORDER BY id';
+//       console.log(consulta);
+//       const result = await pool.query(consulta);
+//       // console.log('ROWS', pools.rowCount, pools.rows);
+//       return result.rows;
+//    } catch (err) {
+//       console.log('Error al obtener los posts: ', err);
+//    }
+// };
 
 const crearPost = async (post) => {
    try {
@@ -33,15 +44,18 @@ const eliminarPost = async (id) => {
    }
 };
 
-const modificarPost = async (titulo, url, descripcion, id) => {
-   console.log(url);
-   const consulta =
-      'UPDATE posts SET titulo = $1, img = $2, descripcion = $3 WHERE id = $4';
-   const values = [titulo, url, descripcion, id];
-   const resultados = await pool.query(consulta, values);
-   console.log(resultados);
-   return resultados;
+const modificarPost = async (id) => {
+   try {
+      const consulta = 'UPDATE posts SET likes = likes + 1 WHERE id = $1';
+      const values = [id];
+      const resultados = await pool.query(consulta, values);
+      console.log(resultados);
+      return resultados;
+   } catch (error) {
+      throw new Error(error);
+   }
 };
 
-obtenerTodosPosts();
-// modificarPost('Uno', 'https://placedog.net/500/200', 'Uno', 123);
+// modificarPost(131);
+
+module.exports = { crearPost, modificarPost, eliminarPost };

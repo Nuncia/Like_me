@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-
+// const morgan = require('morgan');
+const { getDatabase } = require('./database/connection.js');
 const {
    obtenerTodosPosts,
    crearPost,
@@ -11,6 +12,7 @@ const {
 
 //Middleware
 app.use(express.json());
+// app.use(morgan('combined'));
 app.use(cors());
 
 const PORT = process.env.PORT || 3001;
@@ -19,8 +21,8 @@ app.listen(PORT, console.log('Servidor corriendo en puerto, 3001.'));
 
 app.get('/posts', async (req, res) => {
    try {
-      const posts = await obtenerTodosPosts();
-      // console.log('posts:', posts);
+      const posts = await getDatabase();
+      console.log('posts:', posts);
       const respuesta = {
          status: 'Con registros',
          msg: 'Datos encontrados',
@@ -78,18 +80,14 @@ app.delete('/posts/:id', async (req, res) => {
    res.send('Post eliminado con éxito');
 });
 
-app.put('/posts/:id', async (req, res) => {
+app.put('/posts/likes/:id', async (req, res) => {
    try {
       const { id } = req.params;
       console.log(id);
-      console.log('req.body: ', req.body);
-      const { titulo, img, descripcion } = req.body;
-      const posts = await modificarPost(titulo, img, descripcion, id);
+      await modificarPost(id);
       res.status(200).json({ message: 'Post modificado exitosamente.' });
    } catch (error) {
       console.log('Error en metodo PUT: ', error),
          res.status(500).json({ message: 'Error interno del servidor.' });
    }
 });
-
-app.put('/posts/likes/');

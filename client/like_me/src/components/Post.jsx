@@ -1,10 +1,11 @@
 function Post({
    post: { id, titulo, img, descripcion, likes },
-   like,
+   // like,
+   likePostById,
    eliminarPost,
 }) {
    return (
-      <div className="card col-12 col-sm-4 d-inline mx-0 px-3">
+      <div className="card col-12 col-sm-4 d-inline mx-0 px-3 ">
          <div className="card-body  p-0">
             <img className="card-img-top " src={img} />
             <div className="p-3">
@@ -13,7 +14,7 @@ function Post({
                <div className="d-flex justify-content-between align-items-center">
                   <div>
                      <i
-                        onClick={() => like(id)}
+                        onClick={() => likePostById(id)}
                         className={`fa-heart fa-xl ${
                            likes ? 'fa-solid' : 'fa-regular'
                         }`}
