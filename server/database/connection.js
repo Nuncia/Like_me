@@ -1,7 +1,8 @@
-const { Pool } = require('pg');
+const pk = require('pg');
 require('dotenv').config();
+// import dotenv from 'dotenv/config';
 
-// const { Pool } = pk;
+const { Pool } = pk;
 
 const pool = new Pool({
    user: 'postgres',

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Form from './components/Form';
 import Post from './components/Post';
+import { successToast, errorToast } from './utils/toast';
 
 const urlBaseServer = 'http://localhost:3001';
 
@@ -12,27 +13,21 @@ function App() {
    const [posts, setPosts] = useState([]);
 
    const getPosts = async () => {
-      axios
-         .get(`${urlBaseServer}/posts`)
-         .then((response) => {
-            const arreglo = response.data?.posts;
-            if (arreglo) {
-               setPosts([...arreglo]);
-            }
-         })
-         .catch((error) => {
-            console.log(error);
-         });
+      const posts = await axios.get(`${urlBaseServer}/posts`);
+      console.log(posts.data.posts);
+      setPosts(posts.data.posts);
    };
 
    const agregarPost = async () => {
       const post = { titulo, url: imgSrc, descripcion };
       const respuesta = await axios.post(urlBaseServer + '/posts', post);
       const claves = respuesta.data;
+
       // console.log(claves.respuesta);
       if (claves.respuesta.error) {
          alert('Todos los campos obligatorios.');
       }
+
       getPosts();
    };
 
@@ -45,6 +40,7 @@ function App() {
    // este método se utilizará en el siguiente desafío
    const eliminarPost = async (id) => {
       await axios.delete(urlBaseServer + `/posts/${id}`);
+      successToast('Post eliminado con éxito.');
       getPosts();
    };
 

@@ -1,15 +1,4 @@
-const { pool } = require('../database/connection');
-
-const obtener = async () => {
-   try {
-      const consulta = 'select * from posts order by id';
-      const result = await pool.query(consulta);
-      console.log(result.rows);
-      return result.rows;
-   } catch (error) {
-      console.log('Error en Obtener: ', error);
-   }
-};
+const { pool, getDatabase } = require('../database/connection');
 
 const crearPost = async (post) => {
    try {
@@ -46,4 +35,4 @@ const modificarPost = async (id) => {
    }
 };
 
-module.exports = { crearPost, modificarPost, eliminarPost, obtener };
+module.exports = { crearPost, modificarPost, eliminarPost };

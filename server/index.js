@@ -4,36 +4,36 @@ const app = express();
 // const morgan = require('morgan');
 const { getDatabase } = require('./database/connection.js');
 const {
-   obtenerTodosPosts,
    crearPost,
    eliminarPost,
    modificarPost,
-} = require('./models/model.js');
+   obtener,
+} = require('./models/model');
 
 //Middleware
 app.use(express.json());
-// app.use(morgan('combined'));
 app.use(cors());
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, console.log('Servidor corriendo en puerto, 3001.'));
+app.listen(PORT, console.log(`Servidor corriendo en puerto, ${PORT}.`));
 
 app.get('/posts', async (req, res) => {
    try {
-      const posts = await getDatabase();
-      console.log('posts:', posts);
-      const respuesta = {
-         status: 'Con registros',
-         msg: 'Datos encontrados',
-         data: posts,
-         error: false,
-      };
+      const posts = await obtener();
+      console.log('posts: ', posts);
+      // const respuesta = {
+      //    status: 'Con registros',
+      //    msg: 'Datos encontrados',
+      //    data: posts,
+      //    error: false,
+      // };
+      // respuesta.json(posts);
       res.json({
          posts: posts.length > 0 ? posts : [],
       });
    } catch (error) {
-      // console.log('Error al obtener los posts: ', error);
+      console.log('Error metodo GET: ', error);
       const respuesta = {
          status: 'Error desconocido',
          msg: 'Error interno desconocido',
@@ -43,6 +43,33 @@ app.get('/posts', async (req, res) => {
       res.status(500).json(respuesta);
    }
 });
+
+// app.get('/posts', async (req, res) => {
+//    try {
+//       const posts = await getDatabase();
+//       console.log(posts.length);
+//       // console.log('posts:', posts);
+//       const respuesta = {
+//          status: 'Con registros',
+//          msg: 'Datos encontrados',
+//          data: posts,
+//          error: false,
+//       };
+//       respuesta.json(posts);
+//       res.json({
+//          posts: posts.length > 0 ? posts : [],
+//       });
+//    } catch (error) {
+//       console.log('Error al obtener los posts: ', error);
+//       const respuesta = {
+//          status: 'Error desconocido',
+//          msg: 'Error interno desconocido',
+//          data: [],
+//          error: false,
+//       };
+//       res.status(500).json(respuesta);
+//    }
+// });
 
 app.post('/posts', async (req, res) => {
    try {
