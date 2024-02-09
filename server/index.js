@@ -8,13 +8,14 @@ const {
    eliminarPost,
    modificarPost,
    obtener,
+   ObtenerPorID,
 } = require('./models/model');
 
 //Middleware
 app.use(express.json());
 app.use(cors());
 
-const PORT = process.env.PORT || 3001;
+const PORT = 3003;
 
 app.listen(PORT, console.log(`Servidor corriendo en puerto, ${PORT}.`));
 
@@ -28,8 +29,7 @@ app.get('/posts', async (req, res) => {
       //    data: posts,
       //    error: false,
       // };
-      // respuesta.json(posts);
-      res.json({
+      res.status(200).json({
          posts: posts.length > 0 ? posts : [],
       });
    } catch (error) {
@@ -71,50 +71,74 @@ app.get('/posts', async (req, res) => {
 //    }
 // });
 
-app.post('/posts', async (req, res) => {
+app.delete('/posts/:id', async (req, res, next) => {
    try {
-      const { titulo, url, descripcion } = req.body;
-      if (!titulo || !url || !descripcion) {
+      const { id } = req.params;
+      const postId = +Number.parseInt(id);
+      console.log('postId: ', postId);
+      if (isNaN(postId)) {
          const respuesta = {
-            status: 'Faltan datos',
-            msg: 'Todos los campos son requeridos.',
+            status: 'Petición incorrecta',
+            msg: 'Tipo de dato incorrecto',
             error: true,
          };
-         res.json({
-            respuesta,
-         });
+         res.status(400).json(respuesta);
       } else {
-         const post = { titulo, url, descripcion };
-         const nuevoPost = await crearPost(post);
-         const respuesta = {
-            status: 'Registro creado',
-            msg: 'Registro creado con éxito.',
-            error: false,
-         };
-         res.json({
-            respuesta,
-         });
+         const postEliminado = await eliminarPost(postId);
+         console.log(postEliminado);
+         if (postEliminado.rowCount > 0) {
+            const resp = {
+               status: 'Dato eliminado',
+               msg: 'El post fue eliminado con éxito.',
+               error: false,
+            };
+            res.status(200).json(resp);
+         } else {
+            const resp = {
+               status: 'No encontrado',
+               msg: 'El post no existe',
+               error: false,
+            };
+            res.status(404).json(resp);
+         }
       }
    } catch (error) {
-      console.log('Error al crear el post: ', error);
-      return res.status(500).json({ message: 'Error interno del servidor.' });
+      console.log(error);
+      res.status(500).json({ message: 'Error interno del servidor.' });
    }
-});
-
-app.delete('/posts/:id', async (req, res) => {
-   const { id } = req.params;
-   await eliminarPost(id);
-   res.send('Post eliminado con éxito');
 });
 
 app.put('/posts/likes/:id', async (req, res) => {
    try {
       const { id } = req.params;
-      console.log(id);
-      await modificarPost(id);
-      res.status(200).json({ message: 'Post modificado exitosamente.' });
+      const post = Number.parseInt(id);
+      console.log(post);
+      if (isNaN(post)) {
+         const respuesta = {
+            status: 'Petición incorrecta',
+            msg: 'Tipo de dato incorrecto',
+            error: true,
+         };
+         res.status(400).json(respuesta);
+      } else {
+         const rowsCount = await modificarPost(id);
+         if (rowsCount != 0) {
+            res.status(200).json({ message: 'Post modificado exitosamente.' });
+         } else {
+            const respuesta = {
+               status: 'No modificado',
+               msg: 'El post no fue modificado o no existe.',
+               error: true,
+            };
+            res.status(404).json({
+               respuesta,
+            });
+         }
+      }
    } catch (error) {
-      console.log('Error en metodo PUT: ', error),
-         res.status(500).json({ message: 'Error interno del servidor.' });
+      console.log('Error en método PUT: ', error),
+         res
+            .status(500)
+            .json({ message: 'Error interno del servidor.', error: error });
    }
 });

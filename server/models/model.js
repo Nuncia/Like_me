@@ -8,6 +8,19 @@ const obtener = async () => {
       return result.rows;
    } catch (error) {
       console.log('Error en Obtener: ', error);
+      throw new Error(error);
+   }
+};
+
+const ObtenerPorID = async (id) => {
+   try {
+      const consulta = 'SELECT * FROM posts WHERE id = $1';
+      const values = [id];
+      const { rows } = await pool.query(consulta, values);
+      console.log(rows);
+      return rows;
+   } catch (error) {
+      console.log('ObtenerPorID: ', error);
    }
 };
 
@@ -19,31 +32,48 @@ const crearPost = async (post) => {
       const { rowCount, rows } = await pool.query(query, values);
       return rows;
    } catch (error) {
+      console.log(error);
       throw new Error(error);
    }
 };
 
 const eliminarPost = async (id) => {
    try {
-      console.log(id);
       const consulta = 'DELETE FROM posts WHERE id = $1 RETURNING *';
       const values = [id];
-      await pool.query(consulta, values);
+      const { rowCount } = await pool.query(consulta, values);
+      const respuesta = {
+         rowCount: rowCount,
+         msg: '',
+      };
+      return respuesta;
    } catch (error) {
-      console.log(error);
+      const respuesta = {
+         rowCount: 0,
+         msg: error,
+      };
+      return respuesta;
    }
 };
 
 const modificarPost = async (id) => {
    try {
-      const consulta = 'UPDATE posts SET likes = likes + 1 WHERE id = $1';
+      const consulta =
+         'UPDATE posts SET likes = likes + 1 WHERE id = $1 RETURNING *';
       const values = [id];
-      const resultados = await pool.query(consulta, values);
-      console.log(resultados);
-      return resultados;
+      const { rowCount } = await pool.query(consulta, values);
+      console.log(rowCount);
+      return rowCount;
    } catch (error) {
       throw new Error(error);
    }
 };
+// eliminarPost(123);
 
-module.exports = { crearPost, modificarPost, eliminarPost, obtener };
+module.exports = {
+   crearPost,
+   modificarPost,
+   eliminarPost,
+   obtener,
+   ObtenerPorID,
+};

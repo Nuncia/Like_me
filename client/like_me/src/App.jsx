@@ -4,7 +4,7 @@ import Form from './components/Form';
 import Post from './components/Post';
 import { successToast, errorToast } from './utils/toast';
 
-const urlBaseServer = 'http://localhost:3001';
+const urlBaseServer = 'http://localhost:3003';
 
 function App() {
    const [titulo, setTitulo] = useState('');
@@ -16,6 +16,9 @@ function App() {
       const posts = await axios.get(`${urlBaseServer}/posts`);
       console.log(posts.data.posts);
       setPosts(posts.data.posts);
+      setTitulo('');
+      setImgSRC('');
+      setDescripcion('');
    };
 
    const agregarPost = async () => {
