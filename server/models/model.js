@@ -1,5 +1,6 @@
 const { pool } = require('../database/connection');
 
+//Método que obtiene todos los posts
 const obtener = async () => {
    try {
       const consulta = 'select * from posts order by id';
@@ -9,18 +10,6 @@ const obtener = async () => {
    } catch (error) {
       console.log('Error en Obtener: ', error);
       throw new Error(error);
-   }
-};
-
-const ObtenerPorID = async (id) => {
-   try {
-      const consulta = 'SELECT * FROM posts WHERE id = $1';
-      const values = [id];
-      const { rows } = await pool.query(consulta, values);
-      console.log(rows);
-      return rows;
-   } catch (error) {
-      console.log('ObtenerPorID: ', error);
    }
 };
 
@@ -36,7 +25,7 @@ const crearPost = async (post) => {
       throw new Error(error);
    }
 };
-
+//Método que elimina los post
 const eliminarPost = async (id) => {
    try {
       const consulta = 'DELETE FROM posts WHERE id = $1 RETURNING *';
@@ -50,12 +39,13 @@ const eliminarPost = async (id) => {
    } catch (error) {
       const respuesta = {
          rowCount: 0,
-         msg: error,
+         msg: error.message,
       };
       return respuesta;
    }
 };
 
+//Método que incrementa los likes
 const modificarPost = async (id) => {
    try {
       const consulta =
@@ -68,12 +58,10 @@ const modificarPost = async (id) => {
       throw new Error(error);
    }
 };
-// eliminarPost(123);
 
 module.exports = {
    crearPost,
    modificarPost,
    eliminarPost,
    obtener,
-   ObtenerPorID,
 };

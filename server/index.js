@@ -1,14 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-// const morgan = require('morgan');
-const { getDatabase } = require('./database/connection.js');
+// const { getDatabase } = require('./database/connection.js');
 const {
    crearPost,
    eliminarPost,
    modificarPost,
    obtener,
-   ObtenerPorID,
 } = require('./models/model');
 
 //Middleware
@@ -19,21 +17,44 @@ const PORT = 3003;
 
 app.listen(PORT, console.log(`Servidor corriendo en puerto, ${PORT}.`));
 
+app.post('/posts', async (req, res) => {
+   try {
+      const { titulo, url, descripcion } = req.body;
+      console.log(titulo, url, descripcion);
+      if (!titulo || !url || !descripcion) {
+         const respuesta = {
+            status: 'Faltan datos',
+            msg: 'Todos los campos son requeridos.',
+            error: true,
+         };
+         res.json({
+            respuesta,
+         });
+      } else {
+         const post = { titulo, url, descripcion };
+         const nuevoPost = await crearPost(post);
+         const respuesta = {
+            status: 'Registro creado',
+            msg: 'Registro creado con éxito.',
+            error: false,
+         };
+         res.json({
+            respuesta,
+         });
+      }
+   } catch (error) {
+      console.log('Error al crear el post: ', error);
+      return res.status(500).json({ message: 'Error interno del servidor.' });
+   }
+});
+
 app.get('/posts', async (req, res) => {
    try {
       const posts = await obtener();
-      console.log('posts: ', posts);
-      // const respuesta = {
-      //    status: 'Con registros',
-      //    msg: 'Datos encontrados',
-      //    data: posts,
-      //    error: false,
-      // };
       res.status(200).json({
          posts: posts.length > 0 ? posts : [],
       });
    } catch (error) {
-      console.log('Error metodo GET: ', error);
       const respuesta = {
          status: 'Error desconocido',
          msg: 'Error interno desconocido',
@@ -44,39 +65,10 @@ app.get('/posts', async (req, res) => {
    }
 });
 
-// app.get('/posts', async (req, res) => {
-//    try {
-//       const posts = await getDatabase();
-//       console.log(posts.length);
-//       // console.log('posts:', posts);
-//       const respuesta = {
-//          status: 'Con registros',
-//          msg: 'Datos encontrados',
-//          data: posts,
-//          error: false,
-//       };
-//       respuesta.json(posts);
-//       res.json({
-//          posts: posts.length > 0 ? posts : [],
-//       });
-//    } catch (error) {
-//       console.log('Error al obtener los posts: ', error);
-//       const respuesta = {
-//          status: 'Error desconocido',
-//          msg: 'Error interno desconocido',
-//          data: [],
-//          error: false,
-//       };
-//       res.status(500).json(respuesta);
-//    }
-// });
-
-app.delete('/posts/:id', async (req, res, next) => {
+app.delete('/posts/:id', async (req, res) => {
    try {
       const { id } = req.params;
-      const postId = +Number.parseInt(id);
-      console.log('postId: ', postId);
-      if (isNaN(postId)) {
+      if (isNaN(id)) {
          const respuesta = {
             status: 'Petición incorrecta',
             msg: 'Tipo de dato incorrecto',
@@ -84,8 +76,7 @@ app.delete('/posts/:id', async (req, res, next) => {
          };
          res.status(400).json(respuesta);
       } else {
-         const postEliminado = await eliminarPost(postId);
-         console.log(postEliminado);
+         const postEliminado = await eliminarPost(id);
          if (postEliminado.rowCount > 0) {
             const resp = {
                status: 'Dato eliminado',
@@ -103,7 +94,6 @@ app.delete('/posts/:id', async (req, res, next) => {
          }
       }
    } catch (error) {
-      console.log(error);
       res.status(500).json({ message: 'Error interno del servidor.' });
    }
 });

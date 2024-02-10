@@ -14,37 +14,50 @@ function App() {
 
    const getPosts = async () => {
       const posts = await axios.get(`${urlBaseServer}/posts`);
-      console.log(posts.data.posts);
-      setPosts(posts.data.posts);
-      setTitulo('');
-      setImgSRC('');
-      setDescripcion('');
+      const arregloPosts = posts.data.posts;
+      setPosts(arregloPosts);
+      // setTitulo('');
+      // setImgSRC('');
+      // setDescripcion('');
    };
 
    const agregarPost = async () => {
       const post = { titulo, url: imgSrc, descripcion };
-      const respuesta = await axios.post(urlBaseServer + '/posts', post);
-      const claves = respuesta.data;
-
-      // console.log(claves.respuesta);
-      if (claves.respuesta.error) {
-         alert('Todos los campos obligatorios.');
+      console.log(post);
+      const respuesta = await axios.post(
+         'http://localhost:3003' + '/posts',
+         post
+      );
+      const claves = respuesta.data.respuesta;
+      console.log(claves);
+      if (claves) {
+         alert(claves.msg);
       }
-
       getPosts();
    };
 
-   // este método se utilizará en el siguiente desafío
    const likePostById = async (id) => {
       const likeUpDate = await axios.put(urlBaseServer + `/posts/likes/${id}`);
+      const status = likeUpDate.data;
+      console.log(status);
+      if (status.message != 'Post modificado exitosamente.') {
+         alert(status.message);
+      }
       getPosts();
    };
 
-   // este método se utilizará en el siguiente desafío
+   /**
+    * Deletes a post with the given ID.
+    */
    const eliminarPost = async (id) => {
-      await axios.delete(urlBaseServer + `/posts/${id}`);
-      successToast('Post eliminado con éxito.');
-      getPosts();
+      try {
+         const { data } = await axios.delete(urlBaseServer + `/posts/${id}`);
+         getPosts();
+         console.log(data);
+         alert(data.msg);
+      } catch (error) {
+         alert(`Error al eliminar. Vuelva ca cargar la pagina. : ${error}`);
+      }
    };
 
    useEffect(() => {
@@ -65,7 +78,7 @@ function App() {
             </div>
             <div className="col-12 col-sm-8 px-5 row posts align-items-start">
                {posts.length > 0 ? (
-                  posts.map((post, i) => (
+                  posts?.map((post, i) => (
                      <Post
                         key={i}
                         post={post}
