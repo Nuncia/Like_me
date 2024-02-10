@@ -16,9 +16,6 @@ function App() {
       const posts = await axios.get(`${urlBaseServer}/posts`);
       const arregloPosts = posts.data.posts;
       setPosts(arregloPosts);
-      // setTitulo('');
-      // setImgSRC('');
-      // setDescripcion('');
    };
 
    const agregarPost = async () => {
@@ -33,6 +30,9 @@ function App() {
       if (claves) {
          alert(claves.msg);
       }
+      setTitulo('');
+      setImgSRC('');
+      setDescripcion('');
       getPosts();
    };
 
