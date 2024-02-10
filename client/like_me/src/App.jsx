@@ -30,9 +30,9 @@ function App() {
       if (claves) {
          alert(claves.msg);
       }
-      setTitulo('');
-      setImgSRC('');
-      setDescripcion('');
+      // setTitulo('');
+      // setImgSRC('');
+      // setDescripcion('');
       getPosts();
    };
 
